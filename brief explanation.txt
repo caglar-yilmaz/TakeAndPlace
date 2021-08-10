@@ -1,0 +1,10 @@
+A take and place algorithm consist of two processes, perfomed concurrently. 
+Aim of the processes is generating randomly sized, within a grading curve,
+and randomly placed aggregate structure. 
+
+Aggregate is represented by aggregate object which inherits "shape". "Shape"
+consists "Node" and "Edge". "Place" is responsible for generation of random 
+place and the methods related with if the generated place is placeable. "Take" 
+is responsible for generating a random size for an aggragate within specified grades.
+Generation of the grading curve is obtained with "FullerCurve". Finally, execution 
+of the whole process is done by "Execute" which allows us to obtain a list of Aggregate. 
