@@ -25,7 +25,6 @@ namespace TakeAndPlace
             set
             {
                 _Width = value;
-                GenerateEdges();
             }
         }
 
@@ -104,8 +103,11 @@ namespace TakeAndPlace
             _ConvexShapeEdgeList = new List<Edge>();
         }
 
-        public double GenerateShape(double delta, double A0, double A1, Random r)
+        public double GenerateShape(double delta, double A0, double A1,double width, Random r)
         {
+            NodeList.Clear();
+            NodeArray.Clear();
+
             double a = 4 + 6 * r.NextDouble();
             int n = Convert.ToInt32(Math.Round(a));
             List<double> PhiList = new List<double>();
@@ -135,6 +137,9 @@ namespace TakeAndPlace
             }
             CalculateR();
             GenerateEdges();
+
+            /// TODO
+            AdjustTheSize(width);
             return 0;
         }
 
@@ -155,8 +160,10 @@ namespace TakeAndPlace
             GenerateEdges();
         }
 
-        public void GenerateEdges()
+        private void GenerateEdges()
         {
+            EdgeList.Clear();
+
             if (NodeList.Count != 0)
             {
                 for (int i = 0; i < NodeList.Count - 1; i++)
@@ -166,18 +173,20 @@ namespace TakeAndPlace
                 EdgeList.Add(new Edge(NodeList[NodeList.Count - 1], NodeList[0]));
 
             }
-
+            GenerateExpEdgeList();
+            GenerateConvexShapeEdgeList();
         }
 
         public void GenerateExpEdgeList()
         {
+            double thickness = 1.5;
             List<Node> expNodeList = new List<Node>();
             _ExpEdgeList.Clear();
 
-            expNodeList.Add(GenerateExpNode(EdgeList.Last(), EdgeList.First(), 1));
+            expNodeList.Add(GenerateExpNode(EdgeList.Last(), EdgeList.First(), thickness));
             for (int i = 0; i < EdgeList.Count - 1; i++)
             {
-                expNodeList.Add(GenerateExpNode(EdgeList[i], EdgeList[i + 1], 1.5));
+                expNodeList.Add(GenerateExpNode(EdgeList[i], EdgeList[i + 1], thickness));
             }
 
             for (int i = 0; i < expNodeList.Count - 1; i++)
@@ -194,7 +203,7 @@ namespace TakeAndPlace
             return norm;
         }
 
-        public Node GenerateExpNode(Edge edge1, Edge edge2, double t)
+        private Node GenerateExpNode(Edge edge1, Edge edge2, double t)
         {
             Node node = new Node();
             Node V1 = new Node(edge1.Node1.X - edge1.Node2.X, edge1.Node1.Y - edge1.Node2.Y);
@@ -218,7 +227,8 @@ namespace TakeAndPlace
             
             return node;
         }
-        public void CalculateR()
+
+        private void CalculateR()
         {
             double Distance = 0;
             //Node Center = GetCentroid();
@@ -234,7 +244,7 @@ namespace TakeAndPlace
             _R = Distance;
         }
 
-        public void GenerateConvexShapeEdgeList()
+        private void GenerateConvexShapeEdgeList()
         {
             _ConvexShapeEdgeList.Clear();
             List<Node> ConvNodeList;
@@ -250,7 +260,7 @@ namespace TakeAndPlace
             }
         }
         
-        public bool IsConvex(Node node1,Node node2, Node node3)
+        private bool IsConvex(Node node1,Node node2, Node node3)
         {
             //edge listesi ccw, ona göre değerlendiriyor.
             bool flag;
@@ -273,7 +283,8 @@ namespace TakeAndPlace
             }
             return flag;
         }
-        public List<Node> CloneNodeList(List<Edge> elist)
+
+        private List<Node> CloneNodeList(List<Edge> elist)
         {
             List<Node> copylist = new List<Node>();
 
@@ -284,7 +295,7 @@ namespace TakeAndPlace
             return copylist;
         }
 
-        public List<Node> GetConvexShapeNodeList()
+        private List<Node> GetConvexShapeNodeList()
         {
             List<Node> ConvNodeList = new List<Node>();
             List<Node> CopiedNodeList = CloneNodeList(EdgeList);
@@ -339,7 +350,7 @@ namespace TakeAndPlace
         /// </summary>
         /// <param name="edge"></param>
         /// <returns></returns>
-        public List<Node> TransformCoordinates(Edge edge)
+        private List<Node> TransformCoordinates(Edge edge)
         {
             double alfa;
             Node center;
@@ -371,7 +382,7 @@ namespace TakeAndPlace
             return Transformed;
         }
 
-        public double CalculateWidth(List<Node> VertexList)
+        private double CalculateWidth(List<Node> VertexList)
         {
             double w;
             Node minx = new Node();
@@ -396,7 +407,7 @@ namespace TakeAndPlace
             return w;
         }
 
-        public double GetMinWidth()
+        private double GetMinWidth()
         {
             double minw=double.MaxValue;
             double w;
@@ -416,14 +427,33 @@ namespace TakeAndPlace
             return minw;
         }
 
-        public void AdjustTheSize(double width)
+        private void AdjustTheSize(double width)
         {
             double minw;
             double lambda;
 
             minw = GetMinWidth();
             lambda = width / minw;
-            UpdateEdgeList(lambda: lambda);
+            //UpdateEdgeList(lambda: lambda);
+            UpdateNodeArray(lambda);
+            Reset();
+            double ses = GetMinWidth();
         }
+
+
+        /// <summary>
+        /// Nodelist is designed to be contain local coordinates, thats why this method should only be called after the size adjustment at the beginning.
+        /// </summary>
+        /// <param name="lambda"></param>
+        /// <returns></returns>
+        private void UpdateNodeArray(double lambda)
+        {
+            for (int i = 0; i < NodeArray.Count; i++)
+            {
+                NodeArray[i].X = lambda * (NodeArray[i].X ) ;
+                NodeArray[i].Y = lambda * (NodeArray[i].Y ) ;
+            }
+        }
+
     }
 }

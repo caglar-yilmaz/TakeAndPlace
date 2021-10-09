@@ -15,7 +15,7 @@ namespace TakeAndPlace
             _Shape = Shape;
         }
 
-        public void GenerateLocation(ref List<Aggregate> agg,Random r, int j)
+        public void GenerateLocation(ref Aggregate agg,Random r)
         {
             double Eta1 = r.NextDouble();
             double Eta2 = r.NextDouble();
@@ -30,11 +30,17 @@ namespace TakeAndPlace
             double alfa = 2 * Math.PI * qweqwe;
 
 
-            agg[j].Alfa = alfa;
-            agg[j].R = qweqwe;
-            agg[j].Location = new Node(X0, Y0);
+            agg.Alfa = alfa;
+            agg.R = qweqwe;
+            agg.Location = new Node(X0, Y0);
         }
 
+        /// <summary>
+        /// Assumes last item of the list is Agg, if aggregate is not inserted to the list at the end it is going to return true
+        /// </summary>
+        /// <param name="Agg"></param>
+        /// <param name="AggList"></param>
+        /// <returns></returns>
         public bool IsPlaceable(Aggregate Agg, List<Aggregate> AggList)
         {
             // is it within the shape
@@ -50,15 +56,15 @@ namespace TakeAndPlace
                 double Distance = CalculateDistance(Agg.Location, AggList[i].Location);
                 if (true)
                 {
-                if (IsOverlapping(Agg,AggList[i]))
-                {
-                return false;
-                }
-                else if (IsInside(Agg,AggList[i]))
-                {
-                return false;
-                }
-                //calculate two polygon is overlapping or not
+                    if (IsOverlapping(Agg, AggList[i]))
+                    {
+                        return false;
+                    }
+                    else if (IsInside(Agg, AggList[i]))
+                    {
+                        return false;
+                    }
+                    //calculate two polygon is overlapping or not
                 }
             }
             return true;

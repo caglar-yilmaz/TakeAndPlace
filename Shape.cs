@@ -15,12 +15,17 @@ namespace TakeAndPlace
         private double _MaxX;
         private double _MinY;
         private double _MaxY;
+        private Node _Center;
         public Shape()
         {
             _NodeList = new List<Node>();
             _EdgeList = new List<Edge>();
+            _Center = new Node();
         }
 
+        /// <summary>
+        /// nodelist is
+        /// </summary>
         public List<Node> NodeList { get => _NodeList; set => _NodeList = value; }
         public double Alfa { get => _Alfa; set => _Alfa = value; }
 
@@ -28,6 +33,8 @@ namespace TakeAndPlace
         public double MinY { get => _MinY; set => _MinY = value; }
         public double MaxX { get => _MaxX; set => _MaxX = value; }
         public double MaxY { get => _MaxY; set => _MaxY = value; }
+        public double NVertex { get => _NodeList.Count; }
+        public Node Center { get => _Center; }
 
         public List<Edge> EdgeList { get => _EdgeList; }
 
@@ -73,7 +80,7 @@ namespace TakeAndPlace
             {
                 area = GetArea(elist);
 
-                for (int i = 0; i < _EdgeList.Count; i++)
+                for (int i = 0; i < elist.Count; i++)
                 {
                     x += (elist[i].Node1.X + elist[i].Node2.X) * (elist[i].Node1.X * elist[i].Node2.Y - elist[i].Node2.X * elist[i].Node1.Y);
                     y += (elist[i].Node1.Y + elist[i].Node2.Y) * (elist[i].Node1.X * elist[i].Node2.Y - elist[i].Node2.X * elist[i].Node1.Y);
@@ -86,6 +93,8 @@ namespace TakeAndPlace
             center.X = x;
             center.Y = y;
 
+            _Center.X = x;
+            _Center.Y = y;
             return center;
         }
 

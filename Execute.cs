@@ -22,6 +22,7 @@ namespace TakeAndPlace
             Take take;
             double totArea;
             double aggArea;
+            double width;
             Aggregate Agg;
             int j = 0;
    
@@ -41,32 +42,40 @@ namespace TakeAndPlace
 
                 while (totArea > aggArea)
                 {
+                    count = 0;
                     Thread.Sleep(10);
-                    _AggList.Add(new Aggregate());
+                    Aggregate agg = new Aggregate();
+                    _AggList.Add(agg);
                     //_AggList[j].Width = take.AggregateSize();
-                    _AggList[j].GenerateShape(0.5, (SegmentList[i - 1]+ SegmentList[i] )/ 2, (SegmentList[i]- SegmentList[i-1]) / 2,r);
-
+                    width=take.AggregateSize(r);
+                    agg.GenerateShape(0.5, (SegmentList[i - 1]+ SegmentList[i] )/ 2, (SegmentList[i]- SegmentList[i-1]) / 2,width,r);
                     bool flag = true;
                     
-                    place.GenerateLocation(ref _AggList,r,j);
+                    place.GenerateLocation(ref agg, r);
 
-                    while (flag)
+                    while (flag && totArea > aggArea)
                     {
-                        if (place.IsPlaceable(_AggList[j], _AggList))
+                        aggArea = agg.GetArea();
+                        if (place.IsPlaceable(agg, _AggList))
                         {
                             //_AggList.Add(templist[j]);
                             flag = false;
-                            aggArea = _AggList[j].GetArea();
-                            totArea -= aggArea;
+                            aggArea = agg.GetArea();
+                            totArea -= agg.GetArea(agg.ExpEdgeList);
                             j += 1;
-                            count += 1;
+
                             //_AggList[0].AdjustTheSize(20);
+                        }
+                        else if (count == 500)
+                        { 
+                            width = take.AggregateSize(r);
+                            agg.GenerateShape(0.5, (SegmentList[i - 1] + SegmentList[i]) / 2, (SegmentList[i] - SegmentList[i - 1]) / 2, width, r);
+                            count = 0;
                         }
                         else
                         {
-                          
-                            _AggList[j].Reset();
-                            place.GenerateLocation(ref _AggList,r, j);
+                            agg.Reset();
+                            place.GenerateLocation(ref agg,r);
                             count += 1;
                         }
                     }
